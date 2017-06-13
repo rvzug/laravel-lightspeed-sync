@@ -18,5 +18,10 @@ class VoyagerServiceProvider extends ServiceProvider
     */
     public function register()
     {
+        $this->app->singleton(LightspeedSync::class, function ($app) {
+            return new LightspeedSync();
+        });
+
+        $this->app->alias(LightspeedSync::class, 'lightspeedsync');
     }
 }

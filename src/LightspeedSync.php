@@ -2,6 +2,9 @@
 
 namespace Rvzug\LightspeedSync;
 
+use Rvzug\LightspeedSync\Jobs\LightspeedSyncCount;
+use Rvzug\LightspeedSync\Jobs\LightspeedSyncGet;
+use Rvzug\LightspeedSync\Jobs\LightspeedSyncGetPage;
 use Rvzug\LightspeedSync\Models\LightspeedBrand;
 use Rvzug\LightspeedSync\Models\LightspeedCategoriesProduct;
 use Rvzug\LightspeedSync\Models\LightspeedCategory;
@@ -46,29 +49,29 @@ class LightspeedSync
     public function init(array $arg)
     {
         // load standalone resources
-        LightspeedSyncFacade::getAll('deliverydates');
-        LightspeedSyncFacade::getAll('brands');
-        LightspeedSyncFacade::getAll('suppliers');
-        LightspeedSyncFacade::getAll('categories');
-        LightspeedSyncFacade::getAll('types');
-        LightspeedSyncFacade::getAll('tags');
-        LightspeedSyncFacade::getAll('reviews');
-        LightspeedSyncFacade::getAll('typesattributes');
-        LightspeedSyncFacade::getAll('categoriesproducts');
-        LightspeedSyncFacade::getAll('metafields');
-        LightspeedSyncFacade::getAll('variantsmovements');
+        self::getAll('deliverydates');
+        self::getAll('brands');
+        self::getAll('suppliers');
+        self::getAll('categories');
+        self::getAll('types');
+        self::getAll('tags');
+        self::getAll('reviews');
+        self::getAll('typesattributes');
+        self::getAll('categoriesproducts');
+        self::getAll('metafields');
+        self::getAll('variantsmovements');
 
-        LightspeedSyncFacade::getAllWithChildResources('products', self::CHILDRESOURCES['product']);
-        LightspeedSyncFacade::getAllWithChildResources('variants', self::CHILDRESOURCES['product']);
+        self::getAllWithChildResources('products', self::CHILDRESOURCES['product']);
+        self::getAllWithChildResources('variants', self::CHILDRESOURCES['product']);
         // load complex resources
             // with childmodels
 
 
     }
 
-    public static function in($resource, $id = null, $data = [])
+    public function in($resource, $id = null, $data = [])
     {
-        $class = class_name(self::MODEL_BY_RESOURCE[$resource]);
+        $class = get_class(self::MODEL_BY_RESOURCE[$resource]);
 
         if ($id)
             $instance = $class::findOrFail($id);
@@ -79,9 +82,9 @@ class LightspeedSync
         $instance->save();
     }
 
-    public static function out($resource, $id, $create = false, $attributes = [])
+    public function out($resource, $id, $create = false, $attributes = [])
     {
-        $class = class_name(self::MODEL_BY_RESOURCE[$resource]);
+        $class = get_class(self::MODEL_BY_RESOURCE[$resource]);
         $instance = $class::findOrFail($id);
         if($create)
         {
@@ -107,6 +110,36 @@ class LightspeedSync
         else {
             return self::CHILDRESOURCES[$resource];
         }
+    }
+
+    public function count($resource, $params = [])
+    {
+        // well, don't know any logical needs for this but...
+        dispatch(new LightspeedSyncCount($resource, $params, false));
+    }
+
+    public function get($resource, $id = null, $params = [])
+    {
+        if($id == null)
+            self::getAll($resource, $params);
+
+        dispatch(new LightspeedSyncGet($resource, $id, $params));
+    }
+
+    public function getAll($resource, $params = [])
+    {
+        dispatch(new LightspeedSyncCount($resource, $params, true, false));
+    }
+
+    public function getAllWithChildResources($resource, $childresources, $params = [])
+    {
+
+        dispatch(new LightspeedSyncCount($resource, $params, true, $childresources));
+    }
+
+    public function getPage($resource, $page = 1, $param = [], $childresources = false)
+    {
+        dispatch(new LightspeedSyncGetPage($resource, $page, $param, $childresources));
     }
 
 }
