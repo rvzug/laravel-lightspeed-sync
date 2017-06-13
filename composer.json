@@ -7,7 +7,7 @@
     "seoshop",
     "api",
     "laravel-lightspeed-api",
-    "laravel-lightspeed-sync",
+    "laravel-lightspeed-sync"
   ],
   "homepage": "https://github.com/rvzug/laravel-lightspeed-sync",
   "license": "MIT",
@@ -22,7 +22,7 @@
   "require": {
     "php" : "^7.0",
     "illuminate/support": "^5.2.8",
-    "seoshop/seoshop-php": "^1.8"
+    "seoshop/seoshop-php": "^1.8",
     "gunharth/laravel-lightspeed-api": "^1.04"
   },
   "require-dev": {
