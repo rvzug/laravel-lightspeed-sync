@@ -22,7 +22,6 @@
   "require": {
     "php" : "^7.0",
     "illuminate/support": "^5.2.8",
-    "seoshop/seoshop-php": "^1.8",
     "gunharth/laravel-lightspeed-api": "^1.04"
   },
   "require-dev": {
