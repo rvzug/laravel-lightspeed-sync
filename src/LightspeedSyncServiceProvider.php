@@ -4,7 +4,7 @@ namespace Rvzug\LightspeedSync;
 
 use \Illuminate\Support\ServiceProvider as ServiceProvider;
 
-class VoyagerServiceProvider extends ServiceProvider
+class LightspeedSyncServiceProvider extends ServiceProvider
 {
     /**
      * Bootstrap the application services.
