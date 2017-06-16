@@ -8,6 +8,7 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Support\Facades\Log;
 use Rvzug\LightspeedSync\Events\LightspeedSyncCountJobReady;
 use Rvzug\LightspeedSync\Events\LightspeedSyncGetPageJobReady;
 use Rvzug\LightspeedSync\LightspeedSync;
@@ -22,17 +23,21 @@ class LightspeedSyncGetPage implements ShouldQueue
     protected $childresources = false;
     protected $response = null;
 
+    public $tries = 1;
+    public $timeout = 60;
+
     public function __construct($resource, $page, $params = ['limit'=> 250], $childresources)
     {
         if(!$resource)
             throw new \Exception("No resource set");
 
-        if(!page)
+        if(!$page)
             throw new \Exception("No page parameter set");
 
         $this->resource = $resource;
         $this->page = $page;
         $this->params = $params;
+        $this->childresources = $childresources;
 
         $this->params['page'] = $this->page;
     }
@@ -46,16 +51,23 @@ class LightspeedSyncGetPage implements ShouldQueue
             $this->params['page'] = 250;
 
         try {
-            $this->response = LightspeedApi::{$this->resource}()->get($this->params);
+            $this->response = LightspeedApi::{$this->resource}()->get(null, $this->params);
+
+            if ($this->attempts() == 3) {
+                Log::debug("release again over 5 minutes");
+                $this->release(5 * 60);
+            }
         }
         catch (\WebshopappApiException $e) {
             return $e;
         }
 
-        foreach ($this->response as $item)
-            LightspeedSyncFacade::in($this->resource, $item['id'], $item);
+        event(new LightspeedSyncGetPageJobReady($this->resource, $this->response, $this->params, $this->childresources));
 
-        event(new LightspeedSyncGetPageJobReady($this->resource, $this->response, $this->params, $this->get));
+    }
 
+    public function failed(Exception $exception)
+    {
+        dump($exception);
     }
 }

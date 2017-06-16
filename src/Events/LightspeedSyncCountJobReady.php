@@ -13,7 +13,7 @@ class LightspeedSyncCountJobReady {
 
         if($get) {
             if(!in_array('limit', $params) || !is_int($params['limit']) || $params['limit'] == 0)
-                $param['limit'] = 250;
+                $params['limit'] = 250;
 
             $pages = ceil($response / $params['limit']);
 

@@ -8,6 +8,7 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Support\Facades\Log;
 use Rvzug\LightspeedSync\Events\LightspeedSyncCountJobReady;
 use Rvzug\LightspeedSync\LightspeedSync;
 
@@ -20,6 +21,9 @@ class LightspeedSyncCount implements ShouldQueue
     protected $get = false;
     protected $childresources = false;
     protected $response = null;
+
+    public $tries = 1;
+    public $timeout = 60;
 
     public function __construct($resource, $params, $get = false, $childresources = false)
     {
@@ -36,6 +40,13 @@ class LightspeedSyncCount implements ShouldQueue
     {
         try {
             $this->response = LightspeedApi::{$this->resource}()->count($this->params);
+            dump($this->response);
+            Log::debug($this->response);
+
+            if ($this->attempts() == 3) {
+                Log::debug("release again over 5 minutes");
+                $this->release(5 * 60);
+            }
         }
         catch (\WebshopappApiException $e) {
             return $e;
@@ -43,5 +54,10 @@ class LightspeedSyncCount implements ShouldQueue
 
         event(new LightspeedSyncCountJobReady($this->resource, $this->response, $this->params, $this->get, $this->childresources));
 
+    }
+
+    public function failed(Exception $exception)
+    {
+        dump($exception);
     }
 }

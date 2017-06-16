@@ -25,4 +25,9 @@ class LightspeedCategory extends Model
         return $this->hasMany('App\LightspeedCategory', 'parent');
     }
 
+    public function products()
+    {
+        return $this->hasManyThrough('App\LightspeedProduct', 'App\LightspeedCategoriesProduct');
+    }
+
 }

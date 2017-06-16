@@ -6,12 +6,19 @@ use Rvzug\LightspeedSync\LightspeedSyncFacade;
 
 class LightspeedSyncGetJobReady {
 
-    public function __construct($resource, $id, $response, $params = [], $childresources = false)
+    public function __construct($resource, $parentResourceId, $response, $params = [], $childresources = false)
     {
-        if($childresources && is_array($childresources))
+        foreach ($response as $item)
         {
-            foreach($childresources as $oneChildResource)
-                LightspeedSyncFacade::get($oneChildResource, $id, $params);
+            $itemId = $item["id"];
+            LightspeedSyncFacade::in($resource, $itemId, $item, $parentResourceId);
+
+            if($childresources && is_array($childresources))
+            {
+                foreach($childresources as $oneChildResource)
+                    LightspeedSyncFacade::get($oneChildResource, $itemId, $params);
+            }
         }
+
     }
 }

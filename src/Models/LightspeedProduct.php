@@ -14,11 +14,6 @@ class LightspeedProduct extends Model
     protected $fillable = ['id', 'createdAt', 'updatedAt', 'isVisible', 'visibility', 'data01', 'data02', 'data03', 'url', 'title', 'fulltitle', 'description', 'content', 'set', 'brand', 'deliverydate', 'image', 'type', 'supplier',];
     protected $guarded = ['brand', 'deliverydate', 'type', 'supplier'];
     protected $resources = ['brand', 'deliverydate', 'type', 'supplier'];
-    public $submodels = [
-        'attributes' => 'productsAttributes',
-        'images' => 'productsImages',
-//        'relations' => 'productsRelations',
-    ];
 
     protected $casts = [
         'set' => 'array',
@@ -80,46 +75,4 @@ class LightspeedProduct extends Model
         return $this->hasMany('App\LightspeedVariant', 'product');
     }
 
-//    public function attachAttributes($intermediate)
-//    {
-//        $productId = $this->id;
-//
-//        $productattribute = new LightspeedProductAttribute([
-//            'value'=>$intermediate['value'],
-//            'product'=>$productId,
-//            'attribute'=>$intermediate['attribute']['id'],
-//        ]);
-//
-//        $this->productattributes()->save($productattribute);
-//    }
-//
-//    public function detachAttributes()
-//    {
-//        LightspeedProductAttribute::where('product', $this->id)->delete();
-//    }
-//
-//    public function attachImages($intermediate)
-//    {
-//        $productId = $this->id;
-//
-//        $productimage = new LightspeedProductsImage([
-//            'id'=>$intermediate['id'],
-//            'product'=>$productId,
-//            'sortOrder'=>$intermediate['sortOrder'],
-//            'createdAt'=>$intermediate['createdAt'],
-//            'updatedAt'=>$intermediate['updatedAt'],
-//            'extension'=>$intermediate['extension'],
-//            'size'=>$intermediate['size'],
-//            'title'=>$intermediate['title'],
-//            'thumb'=>$intermediate['thumb'],
-//            'src'=>$intermediate['src'],
-//        ]);
-//
-//        $this->images()->save($productimage);
-//    }
-//
-//    public function detachImages()
-//    {
-//        LightspeedProductsImage::where('product', $this->id)->delete();
-//    }
 }

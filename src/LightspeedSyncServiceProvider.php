@@ -3,6 +3,7 @@
 namespace Rvzug\LightspeedSync;
 
 use \Illuminate\Support\ServiceProvider as ServiceProvider;
+use Rvzug\LightspeedSync\Commands\LightspeedSyncCommand;
 
 class LightspeedSyncServiceProvider extends ServiceProvider
 {
@@ -11,6 +12,8 @@ class LightspeedSyncServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        $this->loadMigrationsFrom(__DIR__.'/Migrations/');
+        $this->commands([LightspeedSyncCommand::class]);
     }
 
     /**
